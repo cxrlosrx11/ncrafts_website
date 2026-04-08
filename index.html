@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>N Crafts — Handmade with Love</title>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Pacifico&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root {
+  --pink-light:#f9c8d8;--pink-mid:#f4a0bf;--pink-deep:#e87aaa;--pink-soft:#fde8f0;
+  --blue-light:#c8e8f8;--blue-mid:#a0d4f0;--blue-pale:#e8f5fc;
+  --text-dark:#3a2a35;--text-mid:#7a5a6a;
+  --accent-yellow:#f5c842;--accent-teal:#5abcd4;
+  --card-shadow:0 8px 32px rgba(232,122,170,.15);
+  --hover-shadow:0 16px 48px rgba(232,122,170,.28);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Quicksand',sans-serif;background:linear-gradient(135deg,var(--blue-light) 0%,var(--blue-pale) 40%,var(--pink-soft) 80%,var(--pink-light) 100%);min-height:100vh;color:var(--text-dark);overflow-x:hidden;}
+.page{display:none;min-height:100vh;}
+.page.active{display:block;animation:fadeIn .4s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.blob-bg{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden;}
+.blob{position:absolute;border-radius:50%;filter:blur(60px);opacity:.4;}
+.blob-1{width:500px;height:500px;background:var(--pink-mid);top:-120px;left:-100px;animation:bF 8s ease-in-out infinite;}
+.blob-2{width:420px;height:420px;background:var(--blue-mid);bottom:-80px;right:-80px;animation:bF 10s ease-in-out infinite reverse;}
+.blob-3{width:300px;height:300px;background:var(--pink-light);top:50%;left:60%;animation:bF 7s ease-in-out infinite 2s;}
+@keyframes bF{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(20px,-20px) scale(1.05)}}
+
+nav{position:sticky;top:0;z-index:200;background:rgba(255,255,255,.78);backdrop-filter:blur(18px);border-bottom:2px solid var(--pink-light);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:66px;box-shadow:0 4px 24px rgba(232,122,170,.10);}
+.nav-logo{font-family:'Pacifico',cursive;font-size:1.7rem;color:var(--pink-deep);cursor:pointer;text-shadow:2px 2px 0 var(--blue-light);transition:transform .2s;}
+.nav-logo:hover{transform:scale(1.05) rotate(-2deg);}
+.nav-links{display:flex;gap:6px;align-items:center;}
+.nav-btn{padding:8px 15px;border-radius:50px;border:none;cursor:pointer;font-family:'Quicksand',sans-serif;font-weight:700;font-size:.83rem;background:transparent;color:var(--text-mid);transition:all .2s;}
+.nav-btn:hover,.nav-btn.active-nav{background:var(--pink-deep);color:#fff;transform:translateY(-2px);box-shadow:0 4px 16px rgba(232,122,170,.3);}
+.basket-nav-btn{position:relative;padding:8px 16px 8px 12px;border-radius:50px;border:2px solid var(--pink-light);background:#fff;cursor:pointer;font-family:'Quicksand',sans-serif;font-weight:700;font-size:.83rem;color:var(--pink-deep);display:flex;align-items:center;gap:6px;transition:all .2s;}
+.basket-nav-btn:hover{background:var(--pink-soft);border-color:var(--pink-deep);transform:translateY(-2px);}
+.b-badge{background:var(--pink-deep);color:#fff;border-radius:50%;width:20px;height:20px;font-size:.68rem;font-weight:800;position:absolute;top:-7px;right:-7px;display:none;align-items:center;justify-content:center;}
+.b-badge.show{display:flex;}
+
+.social-bar{display:flex;justify-content:center;gap:16px;padding:20px 0 0;position:relative;z-index:1;}
+.social-icon{width:44px;height:44px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .25s;box-shadow:0 4px 16px rgba(232,122,170,.2);text-decoration:none;font-size:1.1rem;border:2px solid var(--pink-light);}
+.social-icon:hover{background:var(--pink-deep);transform:translateY(-4px) scale(1.1);}
+
+.hero{max-width:1100px;margin:0 auto;padding:36px 24px 56px;position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;}
+.hero-left{display:flex;justify-content:center;}
+.avatar-ring{width:260px;height:260px;border-radius:50%;background:linear-gradient(135deg,var(--pink-mid),var(--blue-mid));padding:6px;box-shadow:0 16px 56px rgba(232,122,170,.35),0 0 0 8px rgba(255,255,255,.6);animation:fl 5s ease-in-out infinite;}
+@keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.avatar-inner{width:100%;height:100%;border-radius:50%;background:linear-gradient(145deg,var(--blue-light),var(--pink-light));display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;position:relative;}
+.avatar-emoji{font-size:4.5rem;}
+.avatar-label{font-family:'Pacifico',cursive;font-size:1rem;color:var(--pink-deep);letter-spacing:3px;}
+.sp{position:absolute;font-size:1.3rem;animation:spA 3s ease-in-out infinite;}
+.sp:nth-child(1){top:18%;left:12%;animation-delay:0s;}
+.sp:nth-child(2){top:12%;right:16%;animation-delay:1s;}
+.sp:nth-child(3){bottom:22%;left:8%;animation-delay:.5s;}
+@keyframes spA{0%,100%{opacity:.3;transform:scale(.8) rotate(0deg)}50%{opacity:1;transform:scale(1.2) rotate(20deg)}}
+.hero-right{display:flex;flex-direction:column;gap:14px;}
+.hero-title{font-family:'Pacifico',cursive;font-size:2.4rem;color:var(--pink-deep);text-shadow:3px 3px 0 rgba(168,214,240,.5);line-height:1.2;}
+.hero-sub{font-size:.93rem;color:var(--text-mid);font-weight:600;line-height:1.6;}
+.menu-cards{display:flex;flex-direction:column;gap:10px;}
+.menu-card{background:rgba(255,255,255,.82);border-radius:16px;padding:13px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .25s;border:2px solid transparent;box-shadow:var(--card-shadow);backdrop-filter:blur(8px);}
+.menu-card:hover{border-color:var(--pink-mid);transform:translateX(6px);box-shadow:var(--hover-shadow);}
+.mc-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+.cp{background:linear-gradient(135deg,var(--pink-light),var(--pink-mid));}
+.cb{background:linear-gradient(135deg,var(--blue-light),var(--blue-mid));}
+.cy{background:linear-gradient(135deg,#fef3c7,var(--accent-yellow));}
+.mc-text h3{font-size:.9rem;font-weight:700;color:var(--text-dark);}
+.mc-text p{font-size:.76rem;color:var(--text-mid);font-weight:500;}
+.mc-arrow{margin-left:auto;color:var(--pink-deep);font-size:1.1rem;opacity:.5;transition:all .2s;}
+.menu-card:hover .mc-arrow{opacity:1;transform:translateX(4px);}
+
+.showcase-strip{max-width:1100px;margin:0 auto 48px;padding:0 24px;position:relative;z-index:1;}
+.strip-title{font-family:'Nunito',sans-serif;font-size:1.3rem;font-weight:800;color:var(--text-dark);margin-bottom:14px;}
+.showcase-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.showcase-item{background:#fff;border-radius:20px;overflow:hidden;cursor:pointer;transition:all .3s;box-shadow:0 6px 24px rgba(168,214,240,.2);border:2px solid var(--blue-light);}
+.showcase-item:hover{transform:translateY(-6px);box-shadow:var(--hover-shadow);border-color:var(--pink-mid);}
+.sc-thumb{height:115px;display:flex;align-items:center;justify-content:center;font-size:3rem;}
+.sc-label{padding:10px 14px;font-weight:700;font-size:.81rem;color:var(--text-dark);text-align:center;}
+
+.inner-page{max-width:920px;margin:0 auto;padding:32px 24px 80px;position:relative;z-index:1;}
+.page-header{display:flex;align-items:center;gap:14px;margin-bottom:26px;}
+.back-btn{width:40px;height:40px;border-radius:50%;background:#fff;border:2px solid var(--pink-light);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;color:var(--pink-deep);transition:all .2s;}
+.back-btn:hover{background:var(--pink-deep);color:#fff;}
+.page-title{font-family:'Pacifico',cursive;font-size:1.85rem;color:var(--pink-deep);text-shadow:2px 2px 0 rgba(168,214,240,.4);}
+.page-badge{background:var(--pink-light);color:var(--pink-deep);border-radius:50px;padding:4px 14px;font-size:.74rem;font-weight:700;}
+
+.items-intro{font-size:.9rem;color:var(--text-mid);font-weight:600;margin-bottom:22px;background:linear-gradient(135deg,var(--blue-pale),var(--pink-soft));border-radius:16px;padding:13px 18px;border:1.5px solid var(--blue-light);}
+.items-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px;}
+.item-card{background:rgba(255,255,255,.9);border-radius:22px;overflow:hidden;cursor:pointer;box-shadow:0 6px 24px rgba(168,214,240,.18);border:2px solid var(--blue-light);transition:all .3s;}
+.item-card:hover{transform:translateY(-8px);box-shadow:var(--hover-shadow);border-color:var(--pink-mid);}
+.item-thumb{height:145px;display:flex;align-items:center;justify-content:center;font-size:3.8rem;}
+.item-info{padding:14px 16px;}
+.item-name{font-weight:800;font-size:.9rem;color:var(--text-dark);margin-bottom:5px;}
+.item-desc{font-size:.76rem;color:var(--text-mid);font-weight:500;line-height:1.5;margin-bottom:10px;}
+.item-footer{display:flex;align-items:center;justify-content:space-between;}
+.item-price{font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;color:var(--pink-deep);}
+.item-tag{display:inline-block;background:var(--blue-light);color:var(--accent-teal);border-radius:50px;padding:2px 9px;font-size:.68rem;font-weight:700;}
+.shop-btn{background:var(--pink-deep);color:#fff;border:none;border-radius:50px;padding:7px 16px;font-family:'Quicksand',sans-serif;font-weight:700;font-size:.76rem;cursor:pointer;transition:all .2s;}
+.shop-btn:hover{background:#d45a90;transform:scale(1.05);}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(58,42,53,.48);backdrop-filter:blur(7px);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s;}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal-box{background:#fff;border-radius:28px;width:100%;max-width:500px;overflow:hidden;box-shadow:0 24px 80px rgba(232,122,170,.3);transform:scale(.92) translateY(20px);transition:transform .35s cubic-bezier(.34,1.56,.64,1);max-height:90vh;overflow-y:auto;}
+.modal-overlay.open .modal-box{transform:scale(1) translateY(0);}
+.modal-header{padding:22px 22px 0;display:flex;align-items:flex-start;gap:14px;}
+.modal-thumb{width:70px;height:70px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:2.3rem;flex-shrink:0;}
+.modal-item-info{flex:1;}
+.modal-item-name{font-family:'Nunito',sans-serif;font-weight:800;font-size:1.08rem;color:var(--text-dark);}
+.modal-item-desc{font-size:.8rem;color:var(--text-mid);font-weight:500;margin-top:3px;line-height:1.45;}
+.modal-item-price{font-family:'Nunito',sans-serif;font-weight:800;font-size:1.15rem;color:var(--pink-deep);margin-top:5px;}
+.modal-close{width:34px;height:34px;border-radius:50%;border:none;background:var(--pink-soft);color:var(--pink-deep);font-size:1rem;cursor:pointer;flex-shrink:0;transition:all .2s;display:flex;align-items:center;justify-content:center;}
+.modal-close:hover{background:var(--pink-deep);color:#fff;}
+.modal-body{padding:16px 22px 22px;display:flex;flex-direction:column;gap:16px;}
+.modal-sec-title{font-weight:800;font-size:.85rem;color:var(--text-dark);margin-bottom:9px;}
+.color-options{display:flex;flex-wrap:wrap;gap:10px;}
+.color-chip{cursor:pointer;text-align:center;}
+.color-chip input{display:none;}
+.color-swatch{width:34px;height:34px;border-radius:50%;border:3px solid transparent;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.12);margin:0 auto;}
+.color-chip input:checked+.color-swatch{border-color:var(--text-dark);transform:scale(1.18);}
+.color-name{font-size:.65rem;font-weight:700;color:var(--text-mid);margin-top:3px;}
+.pack-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.pack-option{cursor:pointer;}
+.pack-option input{display:none;}
+.pack-inner{border:2px solid var(--blue-light);border-radius:14px;padding:11px 13px;transition:all .2s;display:flex;align-items:center;gap:9px;background:rgba(232,248,252,.4);}
+.pack-inner:hover{border-color:var(--pink-mid);}
+.pack-option input:checked+.pack-inner{border-color:var(--pink-deep);background:var(--pink-soft);box-shadow:0 4px 14px rgba(232,122,170,.18);}
+.pack-check{width:20px;height:20px;border-radius:6px;border:2px solid var(--pink-light);background:#fff;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;color:transparent;transition:all .2s;flex-shrink:0;}
+.pack-option input:checked+.pack-inner .pack-check{background:var(--pink-deep);border-color:var(--pink-deep);color:#fff;}
+.pack-emoji{font-size:1.3rem;}
+.pack-text h4{font-weight:700;font-size:.81rem;color:var(--text-dark);}
+.pack-text p{font-size:.7rem;color:var(--text-mid);}
+.modal-qty-row{display:flex;align-items:center;}
+.modal-qty-label{font-weight:800;font-size:.85rem;color:var(--text-dark);}
+.qty-ctrl{display:flex;align-items:center;gap:10px;margin-left:auto;}
+.qty-btn2{width:32px;height:32px;border-radius:10px;border:2px solid var(--pink-light);background:#fff;color:var(--pink-deep);font-size:1.1rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.qty-btn2:hover{background:var(--pink-deep);color:#fff;border-color:var(--pink-deep);}
+.qty-disp{font-family:'Nunito',sans-serif;font-weight:800;font-size:1.1rem;color:var(--text-dark);min-width:26px;text-align:center;}
+.add-basket-btn{width:100%;padding:14px;border-radius:50px;background:linear-gradient(135deg,var(--pink-mid),var(--pink-deep));color:#fff;border:none;font-family:'Quicksand',sans-serif;font-weight:700;font-size:.97rem;cursor:pointer;transition:all .25s;box-shadow:0 8px 24px rgba(232,122,170,.36);display:flex;align-items:center;justify-content:center;gap:8px;}
+.add-basket-btn:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(232,122,170,.5);}
+
+.twitch-banner{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,var(--pink-soft),var(--blue-pale));border-radius:16px;padding:13px 18px;margin-bottom:22px;border:1.5px solid var(--pink-light);}
+.twitch-icon{font-size:2rem;}
+.twitch-text h3{font-weight:700;font-size:.9rem;color:var(--text-dark);}
+.twitch-text p{font-size:.78rem;color:var(--text-mid);font-weight:500;}
+.live-badge{margin-left:auto;background:#f44;color:#fff;border-radius:50px;padding:4px 11px;font-size:.7rem;font-weight:700;letter-spacing:1px;animation:pulse 2s ease-in-out infinite;flex-shrink:0;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+.basket-empty{text-align:center;padding:56px 20px;color:var(--text-mid);}
+.basket-empty-icon{font-size:4rem;margin-bottom:14px;}
+.basket-empty p{font-size:.98rem;font-weight:600;}
+.basket-empty small{font-size:.8rem;opacity:.7;}
+.basket-items{display:flex;flex-direction:column;gap:11px;margin-bottom:22px;}
+.basket-item{background:rgba(255,255,255,.9);border-radius:20px;padding:13px 16px;display:flex;align-items:center;gap:13px;box-shadow:0 4px 20px rgba(168,214,240,.14);border:2px solid var(--blue-light);transition:all .25s;animation:fadeIn .3s ease;}
+.basket-item:hover{border-color:var(--pink-light);}
+.bi-thumb{width:50px;height:50px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.7rem;flex-shrink:0;}
+.bi-info{flex:1;}
+.bi-name{font-weight:800;font-size:.9rem;color:var(--text-dark);}
+.bi-meta{font-size:.73rem;color:var(--text-mid);font-weight:600;margin-top:3px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.color-dot{width:10px;height:10px;border-radius:50%;display:inline-block;border:1.5px solid rgba(0,0,0,.13);flex-shrink:0;}
+.bi-price{font-family:'Nunito',sans-serif;font-weight:800;font-size:.98rem;color:var(--pink-deep);margin-right:8px;white-space:nowrap;}
+.del-btn{width:34px;height:34px;border-radius:50%;border:none;background:var(--pink-soft);color:var(--pink-deep);font-size:.82rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;}
+.del-btn:hover{background:#ff6b8a;color:#fff;transform:scale(1.12);}
+.basket-total-box{background:linear-gradient(135deg,rgba(253,232,240,.92),rgba(232,248,252,.92));border:2px solid var(--pink-light);border-radius:22px;padding:18px 22px;margin-bottom:20px;box-shadow:0 6px 24px rgba(232,122,170,.1);}
+.total-lines{display:flex;flex-direction:column;gap:6px;margin-bottom:11px;}
+.total-line{display:flex;justify-content:space-between;font-size:.83rem;color:var(--text-mid);font-weight:600;}
+.total-divider{border:none;border-top:2px dashed var(--pink-light);margin:6px 0;}
+.basket-grand{display:flex;justify-content:space-between;align-items:center;}
+.bg-label{font-family:'Nunito',sans-serif;font-weight:800;font-size:1.05rem;color:var(--text-dark);}
+.bg-amount{font-family:'Nunito',sans-serif;font-weight:800;font-size:1.35rem;color:var(--pink-deep);}
+.basket-note{font-size:.71rem;color:var(--text-mid);text-align:center;margin-top:9px;opacity:.75;font-weight:600;}
+.submit-order-section{background:rgba(255,255,255,.88);border-radius:22px;padding:20px 22px;border:2px solid var(--pink-light);box-shadow:var(--card-shadow);backdrop-filter:blur(8px);}
+.submit-sec-title{font-weight:800;font-size:.92rem;color:var(--text-dark);margin-bottom:15px;}
+.form-group{margin-bottom:14px;}
+.form-label{display:block;font-weight:700;font-size:.83rem;color:var(--text-dark);margin-bottom:6px;}
+.form-label span{color:var(--pink-deep);}
+.form-input,.form-select,.form-textarea{width:100%;padding:11px 15px;border:2px solid var(--pink-light);border-radius:13px;font-family:'Quicksand',sans-serif;font-size:.87rem;color:var(--text-dark);background:#fff;transition:all .2s;outline:none;}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--pink-deep);box-shadow:0 0 0 4px rgba(232,122,170,.12);}
+.form-textarea{min-height:86px;resize:vertical;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
+
+/* Submit button row */
+.submit-btn-row{display:flex;gap:10px;margin-top:4px;}
+.submit-btn{flex:1;padding:14px;border-radius:50px;background:linear-gradient(135deg,var(--pink-mid),var(--pink-deep));color:#fff;border:none;font-family:'Quicksand',sans-serif;font-weight:700;font-size:.97rem;cursor:pointer;transition:all .25s;box-shadow:0 8px 24px rgba(232,122,170,.36);}
+.submit-btn:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(232,122,170,.5);}
+.pdf-btn{padding:14px 18px;border-radius:50px;background:linear-gradient(135deg,#a0d4f0,#5abcd4);color:#fff;border:none;font-family:'Quicksand',sans-serif;font-weight:700;font-size:.85rem;cursor:pointer;transition:all .25s;box-shadow:0 8px 24px rgba(90,188,212,.3);white-space:nowrap;display:flex;align-items:center;gap:6px;}
+.pdf-btn:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(90,188,212,.45);}
+
+/* Order success overlay */
+.order-success{display:none;position:fixed;inset:0;background:rgba(58,42,53,.55);backdrop-filter:blur(10px);z-index:600;align-items:center;justify-content:center;padding:24px;}
+.order-success.show{display:flex;animation:fadeIn .35s ease;}
+.success-box{background:#fff;border-radius:28px;max-width:440px;width:100%;padding:32px 28px;text-align:center;box-shadow:0 24px 80px rgba(232,122,170,.35);}
+.success-icon{font-size:4rem;margin-bottom:12px;}
+.success-title{font-family:'Pacifico',cursive;font-size:1.6rem;color:var(--pink-deep);margin-bottom:8px;}
+.success-sub{font-size:.88rem;color:var(--text-mid);font-weight:600;line-height:1.6;margin-bottom:22px;}
+.success-actions{display:flex;flex-direction:column;gap:10px;}
+.success-btn-primary{width:100%;padding:13px;border-radius:50px;background:linear-gradient(135deg,var(--pink-mid),var(--pink-deep));color:#fff;border:none;font-family:'Quicksand',sans-serif;font-weight:700;font-size:.92rem;cursor:pointer;transition:all .25s;box-shadow:0 6px 20px rgba(232,122,170,.35);}
+.success-btn-primary:hover{transform:translateY(-2px);}
+.success-btn-secondary{width:100%;padding:13px;border-radius:50px;background:linear-gradient(135deg,var(--blue-light),var(--blue-mid));color:#3a2a35;border:none;font-family:'Quicksand',sans-serif;font-weight:700;font-size:.92rem;cursor:pointer;transition:all .25s;box-shadow:0 6px 20px rgba(160,212,240,.3);}
+.success-btn-secondary:hover{transform:translateY(-2px);}
+.success-btn-ghost{width:100%;padding:11px;border-radius:50px;background:transparent;color:var(--text-mid);border:2px solid var(--pink-light);font-family:'Quicksand',sans-serif;font-weight:700;font-size:.85rem;cursor:pointer;transition:all .2s;}
+.success-btn-ghost:hover{border-color:var(--pink-deep);color:var(--pink-deep);}
+.pdf-hint{font-size:.72rem;color:var(--text-mid);margin-top:10px;opacity:.75;font-weight:600;}
+
+.feedback-grid{display:flex;flex-direction:column;gap:13px;margin-bottom:24px;}
+.feedback-card{background:rgba(255,255,255,.88);border-radius:20px;padding:18px;box-shadow:0 4px 20px rgba(168,214,240,.14);border:2px solid var(--pink-light);backdrop-filter:blur(8px);transition:all .2s;}
+.feedback-card:hover{transform:translateX(4px);border-color:var(--pink-mid);}
+.feedback-header{display:flex;align-items:center;gap:11px;margin-bottom:9px;}
+.fb-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.15rem;flex-shrink:0;}
+.fb-name{font-weight:700;font-size:.86rem;color:var(--text-dark);}
+.fb-date{font-size:.71rem;color:var(--text-mid);}
+.stars{color:var(--accent-yellow);font-size:.95rem;}
+.fb-text{font-size:.82rem;color:var(--text-mid);line-height:1.6;font-weight:500;}
+.fb-product{margin-top:7px;display:inline-block;background:var(--pink-soft);color:var(--pink-deep);border-radius:50px;padding:3px 11px;font-size:.7rem;font-weight:700;}
+.review-btn{display:block;width:100%;padding:14px;border-radius:50px;background:linear-gradient(135deg,var(--blue-mid),var(--accent-teal));color:#fff;border:none;font-family:'Quicksand',sans-serif;font-weight:700;font-size:.97rem;cursor:pointer;transition:all .25s;box-shadow:0 8px 24px rgba(90,188,212,.3);text-align:center;}
+.review-btn:hover{transform:translateY(-3px);}
+
+.video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:17px;}
+.video-card{background:rgba(255,255,255,.88);border-radius:22px;overflow:hidden;cursor:pointer;box-shadow:0 6px 24px rgba(168,214,240,.17);border:2px solid var(--blue-light);transition:all .3s;}
+.video-card:hover{transform:translateY(-6px);box-shadow:var(--hover-shadow);border-color:var(--pink-mid);}
+.vthumb{height:135px;display:flex;align-items:center;justify-content:center;}
+.play-btn{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;font-size:1.35rem;box-shadow:0 4px 20px rgba(0,0,0,.11);transition:transform .2s;}
+.video-card:hover .play-btn{transform:scale(1.15);}
+.vinfo{padding:13px;}
+.vtag{display:inline-block;background:var(--blue-light);color:var(--accent-teal);border-radius:50px;padding:2px 9px;font-size:.68rem;font-weight:700;margin-bottom:5px;}
+.vtitle{font-weight:700;font-size:.84rem;color:var(--text-dark);margin-bottom:4px;}
+.vmeta{font-size:.73rem;color:var(--text-mid);font-weight:600;display:flex;gap:11px;}
+
+.gallery-intro{font-size:.9rem;color:var(--text-mid);font-weight:600;margin-bottom:20px;background:linear-gradient(135deg,var(--pink-soft),var(--blue-pale));border-radius:16px;padding:13px 18px;border:1.5px solid var(--pink-light);}
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:13px;}
+.gallery-item{border-radius:18px;cursor:pointer;box-shadow:0 6px 20px rgba(168,214,240,.17);border:2px solid var(--blue-light);transition:all .3s;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:3.6rem;background:linear-gradient(135deg,var(--pink-soft),var(--blue-pale));}
+.gallery-item:hover{transform:scale(1.05) rotate(1deg);border-color:var(--pink-mid);box-shadow:var(--hover-shadow);}
+
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:linear-gradient(135deg,var(--pink-deep),#d45a90);color:#fff;padding:12px 24px;border-radius:50px;font-weight:700;font-size:.86rem;box-shadow:0 8px 32px rgba(232,122,170,.4);z-index:999;transition:transform .4s cubic-bezier(.34,1.56,.64,1);pointer-events:none;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.page-footer{text-align:center;padding:20px;color:var(--text-mid);font-size:.76rem;font-weight:600;position:relative;z-index:1;}
+
+@media(max-width:680px){
+  .hero{grid-template-columns:1fr;text-align:center;}
+  .avatar-ring{width:200px;height:200px;}
+  .avatar-emoji{font-size:3.5rem;}
+  .hero-title{font-size:2rem;}
+  .showcase-grid{grid-template-columns:1fr;}
+  .form-row{grid-template-columns:1fr;}
+  nav{padding:0 12px;}
+  .nav-btn{padding:6px 9px;font-size:.76rem;}
+  .basket-nav-btn{padding:7px 12px 7px 10px;}
+  .pack-options{grid-template-columns:1fr;}
+  .submit-btn-row{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+
+<div class="blob-bg">
+  <div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div>
+</div>
+
+<nav>
+  <div class="nav-logo" onclick="goTo('home');setActive(null)">✿ N Crafts</div>
+  <div class="nav-links">
+    <button class="nav-btn active-nav" data-page="home"     onclick="goTo('home');setActive(this)">Home</button>
+    <button class="nav-btn"            data-page="items"    onclick="goTo('items');setActive(this)">Shop</button>
+    <button class="nav-btn"            data-page="feedback" onclick="goTo('feedback');setActive(this)">Reviews</button>
+    <button class="nav-btn"            data-page="videos"   onclick="goTo('videos');setActive(this)">Videos</button>
+    <button class="nav-btn"            data-page="showcase" onclick="goTo('showcase');setActive(this)">Gallery</button>
+    <button class="basket-nav-btn" onclick="goTo('basket');setActive(null)">
+      🛒 Basket <span class="b-badge" id="bBadge">0</span>
+    </button>
+  </div>
+</nav>
+
+<!-- HOME -->
+<div id="home" class="page active">
+  <div class="social-bar">
+    <a href="#" class="social-icon" title="Instagram">📷</a>
+    <a href="#" class="social-icon" title="Facebook">📘</a>
+    <a href="#" class="social-icon" title="YouTube">▶️</a>
+    <a href="#" class="social-icon" title="Email">✉️</a>
+    <a href="#" class="social-icon" title="Twitch">🎮</a>
+  </div>
+  <div class="hero">
+    <div class="hero-left">
+      <div class="avatar-ring">
+        <div class="avatar-inner">
+          <span class="sp">✦</span><span class="sp">✦</span><span class="sp">✦</span>
+          <span class="avatar-emoji">🎀</span>
+          <span class="avatar-label">Crafts</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-title">Handmade<br>with Love 🌸</div>
+      <div class="hero-sub">Custom crafts &amp; creative inspiration — watch me create live on Twitch every Saturday!</div>
+      <div class="menu-cards">
+        <div class="menu-card" onclick="goTo('items');setActive(document.querySelector('[data-page=items]'))">
+          <div class="mc-icon cb">🛍️</div>
+          <div class="mc-text"><h3>Shop Items</h3><p>Browse pre-made &amp; custom crafts ready to order</p></div>
+          <span class="mc-arrow">›</span>
+        </div>
+        <div class="menu-card" onclick="goTo('basket');setActive(null)">
+          <div class="mc-icon cp">🛒</div>
+          <div class="mc-text"><h3>My Basket</h3><p>View your selected items and place your order</p></div>
+          <span class="mc-arrow">›</span>
+        </div>
+        <div class="menu-card" onclick="goTo('feedback');setActive(document.querySelector('[data-page=feedback]'))">
+          <div class="mc-icon cy">⭐</div>
+          <div class="mc-text"><h3>Customer Reviews</h3><p>See what our happy customers have to say</p></div>
+          <span class="mc-arrow">›</span>
+        </div>
+        <div class="menu-card" onclick="goTo('videos');setActive(document.querySelector('[data-page=videos]'))">
+          <div class="mc-icon cp">🎬</div>
+          <div class="mc-text"><h3>Video Guides</h3><p>Videos to guide and inspire you to create</p></div>
+          <span class="mc-arrow">›</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="showcase-strip">
+    <div class="strip-title">✨ Featured Works</div>
+    <div class="showcase-grid">
+      <div class="showcase-item" onclick="goTo('showcase');setActive(document.querySelector('[data-page=showcase]'))">
+        <div class="sc-thumb" style="background:linear-gradient(135deg,#fde8f0,#f9c8d8);">🎨</div>
+        <div class="sc-label">Showcase</div>
+      </div>
+      <div class="showcase-item" onclick="goTo('items');setActive(document.querySelector('[data-page=items]'))">
+        <div class="sc-thumb" style="background:linear-gradient(135deg,#e8f5fc,#c8e8f8);">🧸</div>
+        <div class="sc-label">Pre-made Crafts</div>
+      </div>
+      <div class="showcase-item" onclick="goTo('items');setActive(document.querySelector('[data-page=items]'))">
+        <div class="sc-thumb" style="background:linear-gradient(135deg,#f0fde8,#d4f0a0);">🌿</div>
+        <div class="sc-label">Custom Made Crafts</div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer">Made with 🌸 by N Crafts · All rights reserved</div>
+</div>
+
+<!-- SHOP -->
+<div id="items" class="page">
+  <div class="inner-page">
+    <div class="page-header">
+      <button class="back-btn" onclick="goTo('home');setActive(document.querySelector('[data-page=home]'))">‹</button>
+      <div class="page-title">Shop</div>
+      <span class="page-badge">🛍️ Ready to Order</span>
+    </div>
+    <div class="items-intro">✨ Tap any item to customise — pick your colour, packaging, and quantity, then add to basket!</div>
+    <div class="items-grid">
+      <div class="item-card" onclick="openModal(0)">
+        <div class="item-thumb" style="background:linear-gradient(135deg,#fde8f0,#f9c8d8);">🧸</div>
+        <div class="item-info">
+          <div class="item-name">Amigurumi Doll</div>
+          <div class="item-desc">Handcrafted crochet dolls in various characters. Soft, durable, and adorable!</div>
+          <div class="item-footer"><div><div class="item-price">₱350</div><span class="item-tag">Pre-made</span></div><button class="shop-btn" onclick="event.stopPropagation();openModal(0)">Choose ›</button></div>
+        </div>
+      </div>
+      <div class="item-card" onclick="openModal(1)">
+        <div class="item-thumb" style="background:linear-gradient(135deg,#e8f5fc,#c8e8f8);">🌸</div>
+        <div class="item-info">
+          <div class="item-name">Resin Keychain</div>
+          <div class="item-desc">Floral &amp; cute character resin keychains. Perfect accessories or gifts!</div>
+          <div class="item-footer"><div><div class="item-price">₱120</div><span class="item-tag">Pre-made</span></div><button class="shop-btn" onclick="event.stopPropagation();openModal(1)">Choose ›</button></div>
+        </div>
+      </div>
+      <div class="item-card" onclick="openModal(2)">
+        <div class="item-thumb" style="background:linear-gradient(135deg,#fef3c7,#f5c842);">⭐</div>
+        <div class="item-info">
+          <div class="item-name">Sticker Sheet</div>
+          <div class="item-desc">Cute illustrated sticker packs. Waterproof — perfect for laptops &amp; journals!</div>
+          <div class="item-footer"><div><div class="item-price">₱80</div><span class="item-tag">Pre-made</span></div><button class="shop-btn" onclick="event.stopPropagation();openModal(2)">Choose ›</button></div>
+        </div>
+      </div>
+      <div class="item-card" onclick="openModal(3)">
+        <div class="item-thumb" style="background:linear-gradient(135deg,#f0fde8,#d4f0a0);">🎀</div>
+        <div class="item-info">
+          <div class="item-name">Custom Pin</div>
+          <div class="item-desc">Hard enamel custom pins of your favourite character or design!</div>
+          <div class="item-footer"><div><div class="item-price">₱250</div><span class="item-tag">Pre-made</span></div><button class="shop-btn" onclick="event.stopPropagation();openModal(3)">Choose ›</button></div>
+        </div>
+      </div>
+      <div class="item-card" onclick="openModal(4)">
+        <div class="item-thumb" style="background:linear-gradient(135deg,#fde8f0,#c8e8f8);">🧶</div>
+        <div class="item-info">
+          <div class="item-name">Custom Plushie</div>
+          <div class="item-desc">Your design made into a soft plushie! Send your art or character concept.</div>
+          <div class="item-footer"><div><div class="item-price">₱800</div><span class="item-tag">Custom</span></div><button class="shop-btn" onclick="event.stopPropagation();openModal(4)">Choose ›</button></div>
+        </div>
+      </div>
+      <div class="item-card" onclick="openModal(5)">
+        <div class="item-thumb" style="background:linear-gradient(135deg,#e8dafe,#c4a8f4);">🎨</div>
+        <div class="item-info">
+          <div class="item-name">Craft Kit</div>
+          <div class="item-desc">Everything you need to make your own mini craft at home. Great for beginners!</div>
+          <div class="item-footer"><div><div class="item-price">₱250</div><span class="item-tag">DIY</span></div><button class="shop-btn" onclick="event.stopPropagation();openModal(5)">Choose ›</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer">Made with 🌸 by N Crafts</div>
+</div>
+
+<!-- BASKET -->
+<div id="basket" class="page">
+  <div class="inner-page">
+    <div class="page-header">
+      <button class="back-btn" onclick="goTo('items');setActive(document.querySelector('[data-page=items]'))">‹</button>
+      <div class="page-title">My Basket</div>
+      <span class="page-badge" id="bCountBadge">0 items</span>
+    </div>
+    <div class="twitch-banner">
+      <div class="twitch-icon">🎮</div>
+      <div class="twitch-text">
+        <h3>Live Art Sessions — Every Saturday!</h3>
+        <p>Catch me on Twitch as I craft your order live</p>
+      </div>
+      <div class="live-badge">LIVE</div>
+    </div>
+    <div class="basket-empty" id="bEmpty">
+      <div class="basket-empty-icon">🛒</div>
+      <p>Your basket is empty!</p>
+      <small>Head over to the Shop to pick your favourites 🌸</small>
+      <br><br>
+      <button class="shop-btn" style="padding:12px 26px;font-size:.87rem;" onclick="goTo('items');setActive(document.querySelector('[data-page=items]'))">Browse Shop ›</button>
+    </div>
+    <div id="bItems" class="basket-items" style="display:none;"></div>
+    <div class="basket-total-box" id="bTotalBox" style="display:none;">
+      <div class="total-lines" id="bLines"></div>
+      <hr class="total-divider">
+      <div class="basket-grand">
+        <span class="bg-label">🛒 Order Total</span>
+        <span class="bg-amount" id="bGrand">₱0</span>
+      </div>
+      <div class="basket-note">* Shipping fee not yet included</div>
+    </div>
+    <div class="submit-order-section" id="bSubmit" style="display:none;">
+      <div class="submit-sec-title">📋 Complete Your Order</div>
+      <div class="form-group">
+        <label class="form-label">Your Name <span>*</span></label>
+        <input class="form-input" id="fName" type="text" placeholder="e.g. Anna M.">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Email <span>*</span></label>
+          <input class="form-input" id="fEmail" type="email" placeholder="you@example.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Social / Handle</label>
+          <input class="form-input" id="fHandle" type="text" placeholder="@yourhandle">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Preferred Deadline</label>
+        <input class="form-input" id="fDeadline" type="date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Special Notes</label>
+        <textarea class="form-textarea" id="fNotes" placeholder="Any special requests, references, or extra details?"></textarea>
+      </div>
+      <div class="submit-btn-row">
+        <button class="submit-btn" onclick="submitOrder()">Place Order 🌸</button>
+        <button class="pdf-btn" onclick="downloadPDF()">📄 Save PDF</button>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer">Made with 🌸 by N Crafts</div>
+</div>
+
+<!-- REVIEWS -->
+<div id="feedback" class="page">
+  <div class="inner-page">
+    <div class="page-header">
+      <button class="back-btn" onclick="goTo('home');setActive(document.querySelector('[data-page=home]'))">‹</button>
+      <div class="page-title">Customer Reviews</div>
+      <span class="page-badge">⭐ 5.0 Rated</span>
+    </div>
+    <div class="feedback-grid">
+      <div class="feedback-card">
+        <div class="feedback-header"><div class="fb-avatar" style="background:linear-gradient(135deg,#fde8f0,#f9c8d8);">🐱</div><div><div class="fb-name">Mia S.</div><div class="fb-date">March 2025 · <span class="stars">★★★★★</span></div></div></div>
+        <div class="fb-text">Absolutely love my custom amigurumi! She made it look exactly like my reference. So detailed and the quality is amazing. Will definitely order again! 💕</div>
+        <div class="fb-product">Amigurumi Doll</div>
+      </div>
+      <div class="feedback-card">
+        <div class="feedback-header"><div class="fb-avatar" style="background:linear-gradient(135deg,#e8f5fc,#c8e8f8);">🦋</div><div><div class="fb-name">Jake P.</div><div class="fb-date">February 2025 · <span class="stars">★★★★★</span></div></div></div>
+        <div class="fb-text">The resin keychains are so pretty! Got them as gifts for my friends and everyone loved them. Fast shipping and super cute packaging too!</div>
+        <div class="fb-product">Resin Keychain</div>
+      </div>
+      <div class="feedback-card">
+        <div class="feedback-header"><div class="fb-avatar" style="background:linear-gradient(135deg,#fef3c7,#f5c842);">🌻</div><div><div class="fb-name">Rhea T.</div><div class="fb-date">January 2025 · <span class="stars">★★★★★</span></div></div></div>
+        <div class="fb-text">Watched the live session on Twitch while she made my order — it was SO much fun! The craft kit she recommended is perfect for beginners like me. 10/10!</div>
+        <div class="fb-product">Craft Kit</div>
+      </div>
+      <div class="feedback-card">
+        <div class="feedback-header"><div class="fb-avatar" style="background:linear-gradient(135deg,#fde8f0,#c8e8f8);">🌸</div><div><div class="fb-name">Kai L.</div><div class="fb-date">December 2024 · <span class="stars">★★★★★</span></div></div></div>
+        <div class="fb-text">Ordered a custom plushie of my OC and I cried happy tears when it arrived. She captured every detail perfectly. Worth every peso!! 🥹</div>
+        <div class="fb-product">Custom Plushie</div>
+      </div>
+    </div>
+    <button class="review-btn" onclick="showToast('💌 Review form coming soon!')">Leave a Review ✨</button>
+  </div>
+  <div class="page-footer">Made with 🌸 by N Crafts</div>
+</div>
+
+<!-- VIDEOS -->
+<div id="videos" class="page">
+  <div class="inner-page">
+    <div class="page-header">
+      <button class="back-btn" onclick="goTo('home');setActive(document.querySelector('[data-page=home]'))">‹</button>
+      <div class="page-title">Video Guides</div>
+      <span class="page-badge">🎬 Tutorials</span>
+    </div>
+    <div class="video-grid">
+      <div class="video-card" onclick="showToast('🎬 Opening video...')"><div class="vthumb" style="background:linear-gradient(135deg,#fde8f0,#f9c8d8);"><div class="play-btn">▶</div></div><div class="vinfo"><div class="vtag">Beginner</div><div class="vtitle">How to Start Amigurumi — Zero Experience!</div><div class="vmeta"><span>🕐 18 min</span><span>👁 2.4k</span></div></div></div>
+      <div class="video-card" onclick="showToast('🎬 Opening video...')"><div class="vthumb" style="background:linear-gradient(135deg,#e8f5fc,#c8e8f8);"><div class="play-btn">▶</div></div><div class="vinfo"><div class="vtag">Resin</div><div class="vtitle">Easy Resin Art for Cute Keychains</div><div class="vmeta"><span>🕐 24 min</span><span>👁 1.8k</span></div></div></div>
+      <div class="video-card" onclick="showToast('🎬 Opening video...')"><div class="vthumb" style="background:linear-gradient(135deg,#f0fde8,#d4f0a0);"><div class="play-btn">▶</div></div><div class="vinfo"><div class="vtag">Materials</div><div class="vtitle">My Favorite Craft Supplies — What I Swear By</div><div class="vmeta"><span>🕐 12 min</span><span>👁 3.1k</span></div></div></div>
+      <div class="video-card" onclick="showToast('🎬 Opening video...')"><div class="vthumb" style="background:linear-gradient(135deg,#fef3c7,#f5c842);"><div class="play-btn">▶</div></div><div class="vinfo"><div class="vtag">Advanced</div><div class="vtitle">Custom Plushie from Scratch — Full Process</div><div class="vmeta"><span>🕐 45 min</span><span>👁 5.6k</span></div></div></div>
+      <div class="video-card" onclick="showToast('🎬 Opening video...')"><div class="vthumb" style="background:linear-gradient(135deg,#e8dafe,#c4a8f4);"><div class="play-btn">▶</div></div><div class="vinfo"><div class="vtag">Tips</div><div class="vtitle">How to Price Your Handmade Crafts</div><div class="vmeta"><span>🕐 15 min</span><span>👁 2.9k</span></div></div></div>
+      <div class="video-card" onclick="showToast('🎬 Opening video...')"><div class="vthumb" style="background:linear-gradient(135deg,#fde8f0,#c8e8f8);"><div class="play-btn">▶</div></div><div class="vinfo"><div class="vtag">Vlog</div><div class="vtitle">Saturday Twitch Replay — Live Craft Session</div><div class="vmeta"><span>🕐 2h 10m</span><span>👁 890</span></div></div></div>
+    </div>
+  </div>
+  <div class="page-footer">Made with 🌸 by N Crafts</div>
+</div>
+
+<!-- GALLERY -->
+<div id="showcase" class="page">
+  <div class="inner-page">
+    <div class="page-header">
+      <button class="back-btn" onclick="goTo('home');setActive(document.querySelector('[data-page=home]'))">‹</button>
+      <div class="page-title">Gallery</div>
+      <span class="page-badge">🎨 Showcase</span>
+    </div>
+    <div class="gallery-intro">✨ A collection of my favourite handmade pieces — from custom plushies to resin art. Each one made with love!</div>
+    <div class="gallery-grid">
+      <div class="gallery-item" onclick="showToast('🌸 Opening photo...')">🎀</div>
+      <div class="gallery-item" onclick="showToast('🌸 Opening photo...')">🧸</div>
+      <div class="gallery-item" onclick="showToast('🌸 Opening photo...')">🌸</div>
+      <div class="gallery-item" onclick="showToast('🌸 Opening photo...')">💎</div>
+      <div class="gallery-item" onclick="showToast('🌸 Opening photo...')">🦋</div>
+      <div class="gallery-item" onclick="showToast('🌸 Opening photo...')">🌿</div>
+      <div class="gallery-item" onclick="showToast('🌸 Opening photo...')">⭐</div>
+      <div class="gallery-item" onclick="showToast('🌸 Opening photo...')">🎨</div>
+      <div class="gallery-item" onclick="showToast('🌸 Opening photo...')">🐾</div>
+    </div>
+    <div style="margin-top:26px;text-align:center;">
+      <button class="submit-btn" style="max-width:290px;" onclick="goTo('items');setActive(document.querySelector('[data-page=items]'))">Shop Now ›</button>
+    </div>
+  </div>
+  <div class="page-footer">Made with 🌸 by N Crafts</div>
+</div>
+
+<!-- ITEM POPUP MODAL -->
+<div class="modal-overlay" id="mOverlay" onclick="closeOutside(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-thumb" id="mThumb"></div>
+      <div class="modal-item-info">
+        <div class="modal-item-name" id="mName"></div>
+        <div class="modal-item-desc" id="mDesc"></div>
+        <div class="modal-item-price" id="mPrice"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div>
+        <div class="modal-sec-title">🎨 Choose a Colour</div>
+        <div class="color-options" id="mColors"></div>
+      </div>
+      <div>
+        <div class="modal-sec-title">📦 Packaging Type</div>
+        <div class="pack-options">
+          <label class="pack-option">
+            <input type="radio" name="pkg" value="With Pouch" checked>
+            <div class="pack-inner">
+              <div class="pack-check">✓</div>
+              <div class="pack-emoji">👜</div>
+              <div class="pack-text"><h4>With Pouch</h4><p>Cute organza pouch</p></div>
+            </div>
+          </label>
+          <label class="pack-option">
+            <input type="radio" name="pkg" value="No Pouch">
+            <div class="pack-inner">
+              <div class="pack-check">✓</div>
+              <div class="pack-emoji">📦</div>
+              <div class="pack-text"><h4>No Pouch</h4><p>Standard box wrap</p></div>
+            </div>
+          </label>
+        </div>
+      </div>
+      <div class="modal-qty-row">
+        <span class="modal-qty-label">Quantity</span>
+        <div class="qty-ctrl">
+          <button class="qty-btn2" onclick="chgQty(-1)">−</button>
+          <span class="qty-disp" id="mQtyDisp">1</span>
+          <button class="qty-btn2" onclick="chgQty(1)">+</button>
+        </div>
+      </div>
+      <button class="add-basket-btn" onclick="addToBasket()">🛒 Add to Basket — <span id="mTotalSpan">₱0</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ORDER SUCCESS OVERLAY -->
+<div class="order-success" id="orderSuccess">
+  <div class="success-box">
+    <div class="success-icon">🌸</div>
+    <div class="success-title">Order Placed!</div>
+    <div class="success-sub" id="successMsg">Your order has been received. A PDF summary has been downloaded — please attach it when sending to N Crafts!</div>
+    <div class="success-actions">
+      <button class="success-btn-primary" id="btnEmailOrder" onclick="sendEmailOrder()">📧 Email Order to N Crafts</button>
+      <button class="success-btn-secondary" onclick="downloadPDF()">📄 Download PDF Again</button>
+      <button class="success-btn-ghost" onclick="closeSuccess()">Back to Home</button>
+    </div>
+    <div class="pdf-hint">📌 Tip: Attach the downloaded PDF when emailing your order for faster processing!</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const CATALOG = [
+  {name:'Amigurumi Doll', desc:'Handcrafted crochet dolls. Soft, durable, and adorable!',    price:350, emoji:'Amigurumi Doll', bg:'linear-gradient(135deg,#fde8f0,#f9c8d8)', colors:['#f9a8d4','#93c5fd','#6ee7b7','#fde68a','#c4b5fd','#f5f5f5']},
+  {name:'Resin Keychain', desc:'Floral & cute character resin keychains. Perfect gifts!',    price:120, emoji:'Resin Keychain', bg:'linear-gradient(135deg,#e8f5fc,#c8e8f8)', colors:['#fbcfe8','#bfdbfe','#a7f3d0','#fef9c3','#ddd6fe','#ffffff']},
+  {name:'Sticker Sheet',  desc:'Waterproof sticker packs. Perfect for laptops & journals!', price:80,  emoji:'Sticker Sheet', bg:'linear-gradient(135deg,#fef3c7,#f5c842)', colors:['#fda4af','#7dd3fc','#86efac','#fde047','#d8b4fe','#e5e7eb']},
+  {name:'Custom Pin',     desc:'Hard enamel custom pins of your favourite design!',          price:250, emoji:'Custom Pin', bg:'linear-gradient(135deg,#f0fde8,#d4f0a0)', colors:['#f9a8d4','#93c5fd','#6ee7b7','#fde68a','#c4b5fd','#e5e7eb']},
+  {name:'Custom Plushie', desc:'Your design made into a soft plushie! Send us your art.',   price:800, emoji:'Custom Plushie', bg:'linear-gradient(135deg,#fde8f0,#c8e8f8)', colors:['#fecaca','#bfdbfe','#bbf7d0','#fef08a','#e9d5ff','#f3f4f6']},
+  {name:'Craft Kit',      desc:'Everything you need to start crafting at home. DIY fun!',   price:250, emoji:'Craft Kit', bg:'linear-gradient(135deg,#e8dafe,#c4a8f4)', colors:['#fda4af','#7dd3fc','#6ee7b7','#fde68a','#a5b4fc','#d1d5db']},
+];
+const CNAMES = ['Pink','Sky Blue','Mint','Yellow','Lavender','White/Clear'];
+const SHOP_EMAIL = 'sorrocarlo69@gmail.com';
+
+let basket = [];
+let curItem = null;
+let mQty = 1;
+let mColorIdx = 0;
+let lastOrderData = null;
+
+function goTo(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  if (id === 'basket') renderBasket();
+}
+function setActive(btn) {
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active-nav'));
+  if (btn) btn.classList.add('active-nav');
+}
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function openModal(idx) {
+  curItem = CATALOG[idx];
+  mQty = 1;
+  mColorIdx = 0;
+  const thumb = document.getElementById('mThumb');
+  thumb.style.cssText = 'background:'+curItem.bg+';width:70px;height:70px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:800;flex-shrink:0;color:#3a2a35;text-align:center;line-height:1.2;padding:6px;';
+  thumb.textContent = curItem.name.split(' ')[0];
+  document.getElementById('mName').textContent = curItem.name;
+  document.getElementById('mDesc').textContent = curItem.desc;
+  document.getElementById('mPrice').textContent = 'PHP ' + curItem.price.toLocaleString() + ' each';
+  document.getElementById('mQtyDisp').textContent = 1;
+  const colEl = document.getElementById('mColors');
+  colEl.innerHTML = '';
+  curItem.colors.forEach((hex, i) => {
+    const lbl = document.createElement('label');
+    lbl.className = 'color-chip';
+    lbl.innerHTML = `<input type="radio" name="itemColor" value="${i}" ${i===0?'checked':''}
+      onchange="mColorIdx=${i}">
+      <div class="color-swatch" style="background:${hex};"></div>
+      <div class="color-name">${CNAMES[i]}</div>`;
+    colEl.appendChild(lbl);
+  });
+  document.querySelector('input[name="pkg"][value="With Pouch"]').checked = true;
+  updateMTotal();
+  document.getElementById('mOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal() {
+  document.getElementById('mOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeOutside(e) {
+  if (e.target === document.getElementById('mOverlay')) closeModal();
+}
+function chgQty(d) {
+  mQty = Math.max(1, mQty + d);
+  document.getElementById('mQtyDisp').textContent = mQty;
+  updateMTotal();
+}
+function updateMTotal() {
+  if (!curItem) return;
+  document.getElementById('mTotalSpan').textContent = 'PHP ' + (curItem.price * mQty).toLocaleString();
+}
+
+function addToBasket() {
+  const colorIdx = parseInt(document.querySelector('input[name="itemColor"]:checked').value);
+  const pkg = document.querySelector('input[name="pkg"]:checked').value;
+  basket.push({
+    id: Date.now() + Math.random(),
+    name: curItem.name,
+    price: curItem.price,
+    qty: mQty,
+    color: CNAMES[colorIdx],
+    colorHex: curItem.colors[colorIdx],
+    pkg: pkg,
+  });
+  updateBadge();
+  closeModal();
+  showToast('Added to basket — ' + curItem.name + (mQty > 1 ? ' x' + mQty : '') + '!');
+}
+
+function updateBadge() {
+  const n = basket.reduce((s, i) => s + i.qty, 0);
+  const el = document.getElementById('bBadge');
+  el.textContent = n;
+  el.classList.toggle('show', n > 0);
+}
+
+function removeItem(id) {
+  basket = basket.filter(i => i.id !== id);
+  updateBadge();
+  renderBasket();
+  showToast('Item removed');
+}
+
+function renderBasket() {
+  const empty   = document.getElementById('bEmpty');
+  const listEl  = document.getElementById('bItems');
+  const totalEl = document.getElementById('bTotalBox');
+  const subEl   = document.getElementById('bSubmit');
+  const badgeEl = document.getElementById('bCountBadge');
+  if (basket.length === 0) {
+    empty.style.display = 'block';
+    listEl.style.display = 'none';
+    totalEl.style.display = 'none';
+    subEl.style.display = 'none';
+    badgeEl.textContent = '0 items';
+    return;
+  }
+  const totalQty = basket.reduce((s, i) => s + i.qty, 0);
+  badgeEl.textContent = totalQty + (totalQty === 1 ? ' item' : ' items');
+  empty.style.display = 'none';
+  listEl.style.display = 'flex';
+  totalEl.style.display = 'block';
+  subEl.style.display = 'block';
+  listEl.innerHTML = '';
+  basket.forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'basket-item';
+    el.innerHTML = `
+      <div class="bi-thumb" style="background:var(--pink-soft);font-size:.75rem;font-weight:800;color:var(--text-dark);text-align:center;padding:4px;line-height:1.2;">${item.name.split(' ')[0]}</div>
+      <div class="bi-info">
+        <div class="bi-name">${item.name}</div>
+        <div class="bi-meta">
+          <span class="color-dot" style="background:${item.colorHex};"></span>
+          ${item.color} &nbsp;·&nbsp; ${item.pkg} &nbsp;·&nbsp; Qty: ${item.qty}
+        </div>
+      </div>
+      <div class="bi-price">PHP ${(item.price*item.qty).toLocaleString()}</div>
+      <button class="del-btn" onclick="removeItem(${item.id})" title="Remove item">x</button>`;
+    listEl.appendChild(el);
+  });
+  let grand = 0;
+  const linesHtml = basket.map(item => {
+    const sub = item.price * item.qty;
+    grand += sub;
+    return `<div class="total-line"><span>${item.name} x${item.qty} <span style="opacity:.6;font-size:.75rem;">(${item.color})</span></span><span>PHP ${sub.toLocaleString()}</span></div>`;
+  }).join('');
+  document.getElementById('bLines').innerHTML = linesHtml;
+  document.getElementById('bGrand').textContent = 'PHP ' + grand.toLocaleString();
+}
+
+// ── PDF GENERATION ────────────────────────────────────────────────────
+function buildOrderData() {
+  const name     = document.getElementById('fName').value.trim() || 'Not provided';
+  const email    = document.getElementById('fEmail').value.trim() || 'Not provided';
+  const handle   = document.getElementById('fHandle').value.trim() || 'Not provided';
+  const deadline = document.getElementById('fDeadline').value || 'Not specified';
+  const notes    = document.getElementById('fNotes').value.trim() || 'None';
+  const orderDate = new Date().toLocaleDateString('en-PH', {year:'numeric',month:'long',day:'numeric'});
+  const orderID  = 'NC-' + Date.now().toString().slice(-6);
+  let grand = 0;
+  basket.forEach(i => grand += i.price * i.qty);
+  return { name, email, handle, deadline, notes, orderDate, orderID, grand, items: [...basket] };
+}
+
+function generatePDF(orderData) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const pw = doc.internal.pageSize.getWidth();
+  let y = 0;
+
+  // Header bar
+  doc.setFillColor(232, 122, 170);
+  doc.rect(0, 0, pw, 38, 'F');
+
+  // Title
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(22);
+  doc.setTextColor(255, 255, 255);
+  doc.text('N Crafts', 20, 17);
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Handmade with Love', 20, 25);
+  doc.text('sorrocarlo69@gmail.com', 20, 31);
+
+  // Order ID + date (right aligned)
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(11);
+  doc.text('ORDER SUMMARY', pw - 20, 15, { align: 'right' });
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.text('Order ID: ' + orderData.orderID, pw - 20, 22, { align: 'right' });
+  doc.text('Date: ' + orderData.orderDate, pw - 20, 28, { align: 'right' });
+
+  y = 48;
+
+  // Customer details section
+  doc.setFillColor(253, 232, 240);
+  doc.roundedRect(14, y, pw - 28, 42, 3, 3, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(232, 122, 170);
+  doc.text('CUSTOMER DETAILS', 20, y + 8);
+  doc.setTextColor(58, 42, 53);
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Name:', 20, y + 17);
+  doc.setFont('helvetica', 'normal');
+  doc.text(orderData.name, 45, y + 17);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Email:', 20, y + 24);
+  doc.setFont('helvetica', 'normal');
+  doc.text(orderData.email, 45, y + 24);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Handle:', 20, y + 31);
+  doc.setFont('helvetica', 'normal');
+  doc.text(orderData.handle, 45, y + 31);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Deadline:', 110, y + 17);
+  doc.setFont('helvetica', 'normal');
+  doc.text(orderData.deadline, 135, y + 17);
+
+  y += 52;
+
+  // Order items header
+  doc.setFillColor(232, 122, 170);
+  doc.rect(14, y, pw - 28, 8, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.setTextColor(255, 255, 255);
+  doc.text('ITEM', 20, y + 5.5);
+  doc.text('COLOUR', 95, y + 5.5);
+  doc.text('PKG', 125, y + 5.5);
+  doc.text('QTY', 148, y + 5.5);
+  doc.text('SUBTOTAL', pw - 20, y + 5.5, { align: 'right' });
+  y += 10;
+
+  // Items rows
+  orderData.items.forEach((item, idx) => {
+    const sub = item.price * item.qty;
+    if (idx % 2 === 0) {
+      doc.setFillColor(255, 248, 252);
+      doc.rect(14, y - 1, pw - 28, 9, 'F');
+    }
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(58, 42, 53);
+    doc.text(item.name, 20, y + 5);
+    doc.text(item.color, 95, y + 5);
+    doc.text(item.pkg, 125, y + 5);
+    doc.text(String(item.qty), 151, y + 5);
+    doc.setFont('helvetica', 'bold');
+    doc.text('PHP ' + sub.toLocaleString(), pw - 20, y + 5, { align: 'right' });
+    y += 10;
+  });
+
+  // Divider
+  doc.setDrawColor(232, 122, 170);
+  doc.setLineWidth(0.5);
+  doc.line(14, y + 2, pw - 14, y + 2);
+  y += 8;
+
+  // Total
+  doc.setFillColor(232, 122, 170);
+  doc.roundedRect(pw - 75, y, 61, 12, 2, 2, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(11);
+  doc.setTextColor(255, 255, 255);
+  doc.text('TOTAL: PHP ' + orderData.grand.toLocaleString(), pw - 17, y + 8, { align: 'right' });
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(122, 90, 106);
+  doc.text('* Shipping fee not yet included', 20, y + 8);
+  y += 22;
+
+  // Notes
+  if (orderData.notes !== 'None') {
+    doc.setFillColor(232, 248, 252);
+    const noteLines = doc.splitTextToSize('Notes: ' + orderData.notes, pw - 48);
+    const noteH = noteLines.length * 5 + 10;
+    doc.roundedRect(14, y, pw - 28, noteH, 3, 3, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(90, 188, 212);
+    doc.text('SPECIAL NOTES', 20, y + 7);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(58, 42, 53);
+    doc.text(noteLines, 20, y + 13);
+    y += noteH + 8;
+  }
+
+  // Footer
+  const fy = doc.internal.pageSize.getHeight() - 18;
+  doc.setFillColor(232, 122, 170);
+  doc.rect(0, fy, pw, 18, 'F');
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(255, 255, 255);
+  doc.text('Thank you for your order! Made with love by N Crafts.', pw / 2, fy + 7, { align: 'center' });
+  doc.text('Watch live crafting every Saturday on Twitch!', pw / 2, fy + 13, { align: 'center' });
+
+  return doc;
+}
+
+function downloadPDF() {
+  if (basket.length === 0) { showToast('Your basket is empty!'); return; }
+  const orderData = buildOrderData();
+  const doc = generatePDF(orderData);
+  doc.save('NCrafts-Order-' + orderData.orderID + '.pdf');
+  showToast('PDF downloaded!');
+}
+
+function buildEmailBody(orderData) {
+  let itemsList = orderData.items.map(i =>
+    `  - ${i.name} x${i.qty} | ${i.color} | ${i.pkg} | PHP ${(i.price * i.qty).toLocaleString()}`
+  ).join('\n');
+  return `Hi N Crafts!
+
+I would like to place an order. Here are my details:
+
+NAME: ${orderData.name}
+EMAIL: ${orderData.email}
+HANDLE: ${orderData.handle}
+PREFERRED DEADLINE: ${orderData.deadline}
+ORDER ID: ${orderData.orderID}
+ORDER DATE: ${orderData.orderDate}
+
+ORDER ITEMS:
+${itemsList}
+
+ORDER TOTAL: PHP ${orderData.grand.toLocaleString()} (+ shipping)
+
+SPECIAL NOTES:
+${orderData.notes}
+
+(PDF order summary is attached)
+
+Thank you!`;
+}
+
+function submitOrder() {
+  if (basket.length === 0) { showToast('Your basket is empty!'); return; }
+  const name = document.getElementById('fName').value.trim();
+  const email = document.getElementById('fEmail').value.trim();
+  if (!name) { showToast('Please enter your name!'); return; }
+  if (!email) { showToast('Please enter your email!'); return; }
+
+  lastOrderData = buildOrderData();
+
+  // Auto-download PDF
+  const doc = generatePDF(lastOrderData);
+  doc.save('NCrafts-Order-' + lastOrderData.orderID + '.pdf');
+
+  // Clear basket
+  basket = [];
+  updateBadge();
+
+  // Show success overlay
+  document.getElementById('orderSuccess').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function sendEmailOrder() {
+  if (!lastOrderData) return;
+  const subject = encodeURIComponent('New Order - ' + lastOrderData.orderID + ' | N Crafts');
+  const body = encodeURIComponent(buildEmailBody(lastOrderData));
+  const mailtoLink = `mailto:${SHOP_EMAIL}?subject=${subject}&body=${body}`;
+  window.location.href = mailtoLink;
+  showToast('Opening your email app...');
+}
+
+function closeSuccess() {
+  document.getElementById('orderSuccess').classList.remove('show');
+  document.body.style.overflow = '';
+  goTo('home');
+  setActive(document.querySelector('[data-page=home]'));
+}
+</script>
+</body>
+</html>
